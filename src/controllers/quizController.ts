@@ -23,7 +23,7 @@ export const listQuizzes = (req: Request, res: Response) => {
 
   res.status(200).json({
     success: true,
-    quizzes: quizzes.map(q => ({ id: q.id, title: q.title }))
+    quizzes: quizzes.map(q => ({ id: q.quizId, title: q.title }))
   });
 };
 
@@ -86,10 +86,10 @@ export const getQuestionsForQuiz = (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       questions: questions.map(q => ({
-        id: q.id,
+        questionId: q.questionId,
         text: q.text,
         type: q.type,
-        options: q.options.map(o => ({ id: o.id, text: o.text })),
+        options: q.options.map(o => ({ id: o.optionId, text: o.text })),
       }))
     });
   } catch (err: any) {

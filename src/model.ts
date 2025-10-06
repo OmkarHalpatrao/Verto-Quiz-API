@@ -1,11 +1,11 @@
 export interface Option {
-  id: number;
+  optionId: number;
   text: string;
   isCorrect: boolean;
 }
 
 export interface Question {
-  id: number;
+  questionId: number;
   text: string;
   type: 'single_choice' | 'multiple_choice' | 'text';
   options: Option[];
@@ -13,7 +13,7 @@ export interface Question {
 }
 
 export interface Quiz {
-  id: number;
+  quizId: number;
   title: string;
   questions: Question[];
 }

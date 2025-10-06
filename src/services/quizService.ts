@@ -27,7 +27,7 @@ export const createNewQuiz = (data: any): Quiz => {
 
   // Create a new quiz object
   const quiz: Quiz = {
-    id: quizIdCounter++, // auto-increment ID
+    quizId: quizIdCounter++, // auto-increment ID
     title: parsed.title,
     questions: [], // initially empty
   };
@@ -37,11 +37,11 @@ export const createNewQuiz = (data: any): Quiz => {
 };
 
 // Find a quiz by its ID
-export const findQuizById = (id: number) => quizzes.find(q => q.id === id);
+export const findQuizById = (id: number) => quizzes.find(q => q.quizId === id);
 
 // Add questions to a specific quiz
 export const addQuestionsToQuiz = (quizId: number, questionsPayload: any[]): Question[] => {
-  const quiz = quizzes.find(q => q.id === quizId);
+  const quiz = quizzes.find(q => q.quizId === quizId);
   if (!quiz) throw new Error("QUIZ_NOT_FOUND"); // if quiz doesn't exist
 
   if (!Array.isArray(questionsPayload) || questionsPayload.length === 0) {
@@ -57,13 +57,13 @@ export const addQuestionsToQuiz = (quizId: number, questionsPayload: any[]): Que
   const addedQuestions = validatedQuestions.map((q, idx) => {
     // Map options with proper IDs and mark correct ones
     const options = (q.options || []).map((o, i) => ({
-      id: i + 1,
+      optionId: i + 1,
       text: o.text,
       isCorrect: !!o.isCorrect, // ensure boolean
     }));
 
     const question: Question = {
-      id: startId + idx,
+      questionId: startId + idx,
       text: q.text,
       type: q.type,
       options,
@@ -80,7 +80,7 @@ export const addQuestionsToQuiz = (quizId: number, questionsPayload: any[]): Que
 
 // Get all questions for a specific quiz
 export const getQuestionsOfQuiz = (quizId: number) => {
-  const quiz = quizzes.find(q => q.id === quizId);
+  const quiz = quizzes.find(q => q.quizId === quizId);
   if (!quiz) throw new Error("QUIZ_NOT_FOUND");
   return quiz.questions;
 };
@@ -96,7 +96,7 @@ export const scoreQuiz = (quiz: Quiz, answers: any[]) => {
   }
 
   for (const ans of answers) {
-    const q = quiz.questions.find(x => x.id === ans.questionId);
+    const q = quiz.questions.find(x => x.questionId === ans.questionId);
     if (!q) continue; // skip if question not found
 
     if (q.type === "text") {
@@ -122,7 +122,7 @@ export const scoreQuiz = (quiz: Quiz, answers: any[]) => {
       const selected = Array.isArray(ans.selectedOptionIds)
         ? ans.selectedOptionIds[0]
         : ans.selectedOptionIds;
-      if (q.options.find(o => o.isCorrect && o.id === selected)) score += 1;
+      if (q.options.find(o => o.isCorrect && o.optionId === selected)) score += 1;
     } 
     else if (q.type === "multiple_choice") {
       // Multiple choice: compare selected IDs with correct IDs
@@ -132,7 +132,7 @@ export const scoreQuiz = (quiz: Quiz, answers: any[]) => {
           : [ans.selectedOptionIds]
       ).filter(Boolean).map(Number).sort();
 
-      const correctIds = q.options.filter(o => o.isCorrect).map(o => o.id).sort();
+      const correctIds = q.options.filter(o => o.isCorrect).map(o => o.optionId).sort();
       if (JSON.stringify(correctIds) === JSON.stringify(selected)) score += 1;
     }
   }

@@ -1,6 +1,4 @@
-// scoring.test.ts
 import { resetQuizzes } from "../services/quizService";
-
 import {
   createNewQuiz,
   addQuestionsToQuiz,
@@ -18,7 +16,7 @@ describe("Quiz Scoring Tests", () => {
     const quiz = createNewQuiz({ title: "General Knowledge" });
 
     // 2. Add single-choice question
-    const singleChoice = addQuestionsToQuiz(quiz.id, [
+    const singleChoice = addQuestionsToQuiz(quiz.quizId, [
       {
         text: "Capital of India?",
         type: "single_choice",
@@ -30,7 +28,7 @@ describe("Quiz Scoring Tests", () => {
     ]);
 
     // 3. Add multiple-choice question
-    const multipleChoice = addQuestionsToQuiz(quiz.id, [
+    const multipleChoice = addQuestionsToQuiz(quiz.quizId, [
       {
         text: "Select prime numbers",
         type: "multiple_choice",
@@ -44,7 +42,7 @@ describe("Quiz Scoring Tests", () => {
     ]);
 
     // 4. Add text question
-    const textQuestion = addQuestionsToQuiz(quiz.id, [
+    const textQuestion = addQuestionsToQuiz(quiz.quizId, [
       {
         text: "Largest planet?",
         type: "text",
@@ -52,15 +50,17 @@ describe("Quiz Scoring Tests", () => {
         options: [],
       },
     ]);
+
     if (!singleChoice[0] || !multipleChoice[0] || !textQuestion[0]) {
       throw new Error("Test questions not initialized properly");
     }
+
     // 5. Prepare answers
     const answers = [
-      { questionId: singleChoice[0].id, selectedOptionIds: [1] }, // correct
-      { questionId: multipleChoice[0].id, selectedOptionIds: [1, 2, 4] }, // correct
+      { questionId: singleChoice[0].questionId, selectedOptionIds: [1] }, // correct
+      { questionId: multipleChoice[0].questionId, selectedOptionIds: [1, 2, 4] }, // correct
       {
-        questionId: textQuestion[0].id,
+        questionId: textQuestion[0].questionId,
         textAnswer: "The largest planet is Jupiter",
       }, // correct fuzzy match
     ];
@@ -69,22 +69,22 @@ describe("Quiz Scoring Tests", () => {
     const result = scoreQuiz(quiz, answers);
 
     // 7. Assertions
-    expect(result.total).toBe(3); // total questions
-    expect(result.score).toBe(3); // all correct
+    expect(result.total).toBe(3);
+    expect(result.score).toBe(3);
 
     // 8. Test partial/fuzzy matching
     const fuzzyAnswers = [
-      { questionId: textQuestion[0].id, textAnswer: "jupitr" }, // typo
+      { questionId: textQuestion[0].questionId, textAnswer: "jupitr" },
     ];
     const fuzzyResult = scoreQuiz(quiz, fuzzyAnswers);
-    expect(fuzzyResult.score).toBe(1); // should match due to fuzzy
+    expect(fuzzyResult.score).toBe(1);
   });
 
   test("Incorrect answers should score zero", () => {
     const quiz = createNewQuiz({ title: "Science Quiz" });
 
     // Add single-choice question
-    const singleChoice = addQuestionsToQuiz(quiz.id, [
+    const singleChoice = addQuestionsToQuiz(quiz.quizId, [
       {
         text: "Capital of France?",
         type: "single_choice",
@@ -96,7 +96,7 @@ describe("Quiz Scoring Tests", () => {
     ]);
 
     // Add multiple-choice question
-    const multipleChoice = addQuestionsToQuiz(quiz.id, [
+    const multipleChoice = addQuestionsToQuiz(quiz.quizId, [
       {
         text: "Select even numbers",
         type: "multiple_choice",
@@ -110,7 +110,7 @@ describe("Quiz Scoring Tests", () => {
     ]);
 
     // Add text question
-    const textQuestion = addQuestionsToQuiz(quiz.id, [
+    const textQuestion = addQuestionsToQuiz(quiz.quizId, [
       {
         text: "Largest planet?",
         type: "text",
@@ -118,13 +118,15 @@ describe("Quiz Scoring Tests", () => {
         options: [],
       },
     ]);
-if (!singleChoice[0] || !multipleChoice[0] || !textQuestion[0]) {
-  throw new Error("Test questions not initialized properly");
-}
+
+    if (!singleChoice[0] || !multipleChoice[0] || !textQuestion[0]) {
+      throw new Error("Test questions not initialized properly");
+    }
+
     const answers = [
-      { questionId: singleChoice[0].id, selectedOptionIds: [2] }, // wrong
-      { questionId: multipleChoice[0].id, selectedOptionIds: [1, 3] }, // wrong
-      { questionId: textQuestion[0].id, textAnswer: "Saturn" }, // wrong
+      { questionId: singleChoice[0].questionId, selectedOptionIds: [2] },
+      { questionId: multipleChoice[0].questionId, selectedOptionIds: [1, 3] },
+      { questionId: textQuestion[0].questionId, textAnswer: "Saturn" },
     ];
 
     const result = scoreQuiz(quiz, answers);
